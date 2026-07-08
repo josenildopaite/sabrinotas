@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<style>
+    .titulo-pagina {
+        font-size: 26px;
+        font-weight: 700;
+        margin-bottom: 22px;
+    }
+
+    .categoria-card {
+        overflow: hidden;
+    }
+
+    .categoria-linha {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 18px;
+        border-bottom: 1px solid #E5E7EB;
+        gap: 20px;
+    }
+
+    .categoria-linha:last-child {
+        border-bottom: none;
+    }
+
+    .categoria-info {
+        font-size: 18px;
+        font-weight: 700;
+        min-width: 220px;
+    }
+
+    .categoria-info span {
+        font-weight: 400;
+        color: #64748B;
+    }
+
+    .categoria-acoes {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .categoria-acoes input {
+        width: 260px;
+        height: 38px;
+        border: 1px solid #CBD5E1;
+        border-radius: 10px;
+        padding: 6px 10px;
+    }
+</style>
+
+<h3 class="titulo-pagina">📂 Categorias</h3>
+
+<div class="card categoria-card">
+
+    {% for categoria in categorias %}
+
+    <div class="categoria-linha">
+
+        <div class="categoria-info">
+            📁 {{ categoria[1] }}
+            <span>({{ categoria[2] }})</span>
+        </div>
+
+        <div class="categoria-acoes">
+
+            <form action="/editar_categoria/{{ categoria[0] }}" method="POST" class="d-flex gap-2">
+                <input type="text" name="nome" value="{{ categoria[1] }}" required>
+
+                <button type="submit" class="btn btn-sm btn-warning">
+                    Salvar
+                </button>
+            </form>
+
+            <form action="/excluir_categoria/{{ categoria[0] }}" method="POST">
+                <button type="submit"
+                        class="btn btn-sm btn-outline-danger"
+                        onclick="return confirm('Tem certeza que deseja excluir esta categoria? Só será excluída se não tiver notas.');">
+                    Excluir
+                </button>
+            </form>
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

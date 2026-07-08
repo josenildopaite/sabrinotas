@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<h3 class="mb-4">🔑 Redefinir Senha</h3>
+
+<div class="card">
+    <div class="card-body">
+
+        <p>
+            Usuário:
+            <strong>{{ usuario[1] }}</strong>
+            <br>
+            E-mail:
+            <strong>{{ usuario[2] }}</strong>
+        </p>
+
+        <form method="POST">
+
+            <div class="mb-3">
+                <label class="form-label">Nova senha</label>
+                <input type="password" name="nova_senha" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Confirmar nova senha</label>
+                <input type="password" name="confirmar_senha" class="form-control" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Salvar nova senha
+            </button>
+
+            <a href="/usuarios" class="btn btn-secondary">
+                Cancelar
+            </a>
+
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

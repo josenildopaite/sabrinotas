@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>SabriNotas</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: #F8FAFC;
+            color: #334155;
+        }
+
+        .navbar {
+            background: #B1D3B9 !important;
+            min-height: 64px;
+            box-shadow: 0 2px 12px rgba(0,0,0,.06);
+        }
+
+        .navbar-brand {
+            color: #1F2937 !important;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .navbar .nav-link {
+            color: #1F2937 !important;
+            font-weight: 600;
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin: 0 2px;
+            transition: .2s;
+        }
+
+        .navbar .nav-link:hover {
+            background: rgba(255,255,255,.45);
+            color: #0F5132 !important;
+        }
+
+        .navbar .nav-link.active {
+            background: #ffffff;
+            color: #0F5132 !important;
+        }
+
+        .dropdown-menu {
+            border: none;
+            border-radius: 14px;
+            box-shadow: 0 12px 30px rgba(0,0,0,.12);
+            padding: 8px;
+        }
+
+        .dropdown-item {
+            border-radius: 10px;
+            padding: 9px 12px;
+            font-weight: 500;
+        }
+
+        .dropdown-item:hover {
+            background: #E8F5EC;
+        }
+
+        .container {
+            max-width: 1100px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 18px;
+            box-shadow: 0 8px 24px rgba(15,23,42,.06);
+        }
+
+        .btn {
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .form-control,
+        .form-select,
+        .input-group-text {
+            border-radius: 12px;
+        }
+
+        .input-group .input-group-text {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .input-group .form-control {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container-fluid px-4">
+
+        <a class="navbar-brand d-flex align-items-center" href="/">
+            <img src="{{ url_for('static', filename='imagens/logo.png') }}"
+                 width="34"
+                 height="34"
+                 class="me-2">
+            SabriNotas
+        </a>
+
+        <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="menu">
+
+            <div class="navbar-nav ms-3">
+
+                <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">
+                    Início
+                </a>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {% if request.path.startswith('/notas') %}active{% endif %}"
+                       href="#"
+                       role="button"
+                       data-bs-toggle="dropdown">
+                        Notas
+                    </a>
+
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="/notas">
+                                📚 Todas as Notas
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item" href="/notas/publicas">
+                                🌎 Notas Públicas
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item" href="/notas/privadas">
+                                🔒 Minhas Notas
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <a class="nav-link {% if request.path == '/nova' %}active{% endif %}" href="/nova">
+                    Nova Nota
+                </a>
+
+                <a class="nav-link {% if request.path == '/categorias' %}active{% endif %}" href="/categorias">
+                    Categorias
+                </a>
+
+                <a class="nav-link {% if request.path == '/favoritos' %}active{% endif %}" href="/favoritos">
+                    Favoritos
+                </a>
+
+                {% if session.get("usuario_perfil") == "admin" %}
+                    <a class="nav-link {% if request.path == '/usuarios' %}active{% endif %}" href="/usuarios">
+                        Usuários
+                    </a>
+                {% endif %}
+
+            </div>
+
+            <div class="ms-auto navbar-nav">
+
+                {% if session.get("usuario_nome") %}
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle"
+                           href="#"
+                           role="button"
+                           data-bs-toggle="dropdown">
+                            {{ session["usuario_nome"] }}
+                        </a>
+
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="/meu_perfil">
+                                    👤 Meu Perfil
+                                </a>
+                            </li>
+
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+
+                            <li>
+                                <a class="dropdown-item text-danger" href="/logout">
+                                    🚪 Sair
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                {% else %}
+
+                    <a class="nav-link" href="/login">
+                        Login
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    {% block conteudo %}
+    {% endblock %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+{% block scripts %}
+{% endblock %}
+
+</body>
+</html>

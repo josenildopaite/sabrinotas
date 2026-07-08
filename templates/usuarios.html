@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<h3 class="mb-4">👥 Usuários</h3>
+
+<a href="/cadastro" class="btn btn-primary mb-3">
+    ➕ Novo Usuário
+</a>
+
+<table class="table table-bordered table-hover align-middle">
+
+    <thead class="table-primary">
+        <tr>
+            <th>Nome</th>
+            <th>E-mail</th>
+            <th>Perfil</th>
+            <th width="350">Ações</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        {% for usuario in usuarios %}
+
+        <tr>
+
+            <td>{{ usuario[1] }}</td>
+
+            <td>{{ usuario[2] }}</td>
+
+            <td>
+
+                {% if usuario[3] == "admin" %}
+                    👑 Administrador
+
+                {% elif usuario[3] == "pendente" %}
+                    🕒 Pendente
+
+                {% else %}
+                    👤 Usuário
+
+                {% endif %}
+
+            </td>
+
+            <td>
+
+                {% if usuario[3] == "pendente" %}
+
+                <form method="POST"
+                      action="/aprovar_usuario/{{ usuario[0] }}"
+                      style="display:inline;">
+
+                    <button class="btn btn-success btn-sm">
+                        ✅ Aprovar
+                    </button>
+
+                </form>
+
+                {% endif %}
+
+                {% if usuario[0] != session["usuario_id"] %}
+
+                    {% if usuario[3] == "usuario" %}
+
+                    <form method="POST"
+                          action="/tornar_admin/{{ usuario[0] }}"
+                          style="display:inline;">
+
+                        <button class="btn btn-warning btn-sm">
+                            👑 Tornar Admin
+                        </button>
+
+                    </form>
+
+                    {% endif %}
+
+                    <a href="/redefinir_senha/{{ usuario[0] }}"
+                       class="btn btn-info btn-sm">
+                        🔑 Senha
+                    </a>
+
+                    <form method="POST"
+                          action="/excluir_usuario/{{ usuario[0] }}"
+                          style="display:inline;"
+                          onsubmit="return confirm('Deseja realmente excluir este usuário?');">
+
+                        <button class="btn btn-danger btn-sm">
+                            🗑 Excluir
+                        </button>
+
+                    </form>
+
+                {% endif %}
+
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endblock %}

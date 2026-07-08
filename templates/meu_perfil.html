@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<h3 class="mb-4">👤 Meu Perfil</h3>
+
+<div class="card">
+    <div class="card-body">
+
+        <p>
+            Nome: <strong>{{ usuario[1] }}</strong><br>
+            E-mail: <strong>{{ usuario[2] }}</strong>
+        </p>
+
+        {% if mensagem %}
+            <div class="alert alert-info">
+                {{ mensagem }}
+            </div>
+        {% endif %}
+
+        <form method="POST">
+
+            <div class="mb-3">
+                <label class="form-label">Senha atual</label>
+                <input type="password" name="senha_atual" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Nova senha</label>
+                <input type="password" name="nova_senha" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Confirmar nova senha</label>
+                <input type="password" name="confirmar_senha" class="form-control" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Salvar alteração
+            </button>
+
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

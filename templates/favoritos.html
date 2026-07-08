@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<h3 class="mb-4">⭐ Favoritos</h3>
+
+<div class="card">
+
+    <div class="card-header bg-warning">
+        Minhas notas favoritas
+    </div>
+
+    <div class="card-body p-0">
+
+        {% if favoritos %}
+
+            {% for nota in favoritos %}
+
+            <a href="/nota/{{ nota[0] }}" class="text-decoration-none text-dark">
+
+                <div class="border-bottom py-3 px-4 fs-5">
+
+                    ⭐ <strong>{{ nota[1] }}</strong>
+
+                    <span class="text-muted">
+                        — {{ nota[2] }}
+                    </span>
+
+                </div>
+
+            </a>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="p-4 text-center text-muted">
+
+                Nenhuma nota foi marcada como favorita.
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

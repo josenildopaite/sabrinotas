@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<style>
+    .area-busca {
+        margin-top: 25px;
+    }
+
+    .search-card {
+        padding: 24px;
+        border-radius: 18px;
+    }
+
+    .resultado-google {
+        padding: 14px 4px;
+        border-bottom: 1px solid #E5E7EB;
+    }
+
+    .resultado-google h5 {
+        margin-bottom: 4px;
+        font-size: 20px;
+    }
+
+    .resultado-google h5 a {
+        color: #0D6EFD;
+        text-decoration: none;
+    }
+
+    .resultado-google h5 a:hover {
+        text-decoration: underline;
+    }
+
+   
+    .trecho-resultado {
+        color: #4B5563;
+        font-size: 15px;
+        line-height: 1.4;
+    }
+
+    mark {
+        background: #FFF3CD;
+        padding: 0 3px;
+        border-radius: 4px;
+    }
+</style>
+
+<div class="area-busca">
+
+    <div class="card search-card mb-4">
+
+        <h5 class="mb-3">🔎 Pesquisar notas</h5>
+
+        <div class="input-group">
+            <span class="input-group-text">Buscar</span>
+
+            <input type="text"
+                   id="campoBusca"
+                   class="form-control"
+                   placeholder="Digite título, categoria ou conteúdo">
+        </div>
+
+    </div>
+
+    <div id="areaResultados"></div>
+
+</div>
+
+<div id="listaNotas" style="display:none;">
+
+    {% for nota in resultados %}
+
+        <div class="nota-item"
+             data-id="{{ nota[0] }}"
+             data-titulo="{{ nota[1] }}"
+             data-categoria="{{ nota[2] }}"
+             data-texto="{{ nota[3]|striptags }}">
+
+        </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    const campoBusca = document.getElementById("campoBusca");
+    const areaResultados = document.getElementById("areaResultados");
+    const notas = document.querySelectorAll(".nota-item");
+
+    function limparTexto(texto) {
+        return texto.replace(/\s+/g, " ").trim();
+    }
+
+    function destacarTermo(texto, termo) {
+        const regex = new RegExp("(" + termo + ")", "gi");
+        return texto.replace(regex, "<mark>$1</mark>");
+    }
+
+    function criarTrecho(texto, termo) {
+        texto = limparTexto(texto);
+
+        const textoMinusculo = texto.toLowerCase();
+        const termoMinusculo = termo.toLowerCase();
+
+        const posicao = textoMinusculo.indexOf(termoMinusculo);
+
+        if (posicao === -1) {
+            return texto.substring(0, 180) + "...";
+        }
+
+        let inicio = Math.max(0, posicao - 70);
+        let fim = Math.min(texto.length, posicao + termo.length + 110);
+
+        let trecho = texto.substring(inicio, fim);
+
+        if (inicio > 0) {
+            trecho = "... " + trecho;
+        }
+
+        if (fim < texto.length) {
+            trecho = trecho + " ...";
+        }
+
+        return destacarTermo(trecho, termo);
+    }
+
+    campoBusca.addEventListener("input", function () {
+        const termo = campoBusca.value.trim().toLowerCase();
+
+        areaResultados.innerHTML = "";
+
+        if (termo === "") {
+            return;
+        }
+
+        let encontrados = 0;
+
+        notas.forEach(function (nota) {
+            const id = nota.dataset.id;
+            const titulo = nota.dataset.titulo;
+            const categoria = nota.dataset.categoria;
+            const texto = nota.dataset.texto;
+
+            const tituloLower = titulo.toLowerCase();
+            const categoriaLower = categoria.toLowerCase();
+            const textoLower = texto.toLowerCase();
+
+            if (
+                tituloLower.includes(termo) ||
+                categoriaLower.includes(termo) ||
+                textoLower.includes(termo)
+            ) {
+                encontrados++;
+
+                const tituloDestacado = destacarTermo(titulo, termo);
+                const categoriaDestacada = destacarTermo(categoria, termo);
+                const trecho = criarTrecho(texto, termo);
+
+                areaResultados.innerHTML += `
+                    <div class="resultado-google">
+                        <h5>
+                            <a href="/nota/${id}">
+                                ${tituloDestacado}
+                            </a>
+                        </h5>
+
+                    
+
+                        <div class="trecho-resultado">
+                            ${trecho}
+                        </div>
+                    </div>
+                `;
+            }
+        });
+
+        if (encontrados === 0) {
+            areaResultados.innerHTML = `
+                <div class="alert alert-warning">
+                    Nenhuma nota encontrada.
+                </div>
+            `;
+        }
+    });
+</script>
+
+{% endblock %}

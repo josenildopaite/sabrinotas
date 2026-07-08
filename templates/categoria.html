@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<h3 class="mb-4">📂 {{ categoria }}</h3>
+
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        Notas desta categoria
+    </div>
+
+    <div class="card-body">
+
+        {% if notas %}
+
+            {% for nota in notas %}
+                <a href="/nota/{{ nota[0] }}" class="text-decoration-none">
+
+    <p class="fs-5">
+        📄 {{ nota[1] }}
+    </p>
+
+</a>
+            {% endfor %}
+
+        {% else %}
+
+            <p class="text-muted">
+                Nenhuma nota encontrada nesta categoria.
+            </p>
+
+        {% endif %}
+
+    </div>
+</div>
+
+<a href="/notas" class="btn btn-secondary mt-3">
+    Voltar
+</a>
+
+{% endblock %}

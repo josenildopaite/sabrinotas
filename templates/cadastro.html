@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<h3 class="mb-4">👤 Cadastro de Usuário</h3>
+
+<form method="POST">
+
+    <div class="mb-3">
+        <label class="form-label">Nome</label>
+        <input type="text" name="nome" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">E-mail</label>
+        <input type="email" name="email" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Senha</label>
+        <input type="password" name="senha" class="form-control" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Cadastrar</button>
+    <a href="/" class="btn btn-secondary">Cancelar</a>
+
+</form>
+
+{% endblock %}
