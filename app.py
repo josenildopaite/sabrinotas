@@ -946,6 +946,7 @@ def meu_perfil():
 
     return render_template("meu_perfil.html", usuario=usuario, mensagem=mensagem)
 
+criar_banco()
+
 if __name__ == "__main__":
-    criar_banco()
     app.run(debug=True)
