@@ -13,7 +13,7 @@ app = Flask(__name__)
 
 app.secret_key = os.getenv(
     "SECRET_KEY",
-    "chave_local_de_desenvolvimento"
+    "3b8f91d67e5a4f2cb984d0a76f5e2b4a91d83c76ef2b4a8c9d6e1f0a4b7c3d2"
 )
 
 
