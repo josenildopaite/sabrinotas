@@ -1,4 +1,3 @@
-from flask import Flask, render_template, request, redirect, jsonify, send_from_directory, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from banco import conectar, criar_banco, erro_integridade
@@ -10,10 +9,12 @@ import cloudinary.uploader
 cloudinary.config()
 
 app = Flask(__name__)
-app.secret_key = "chave_secreta_do_sistema"
 
-UPLOAD_FOLDER = "uploads/imagens"
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+app.secret_key = os.getenv(
+    "SECRET_KEY",
+    "chave_local_de_desenvolvimento"
+)
+
 
 
 def login_obrigatorio(funcao):
@@ -585,9 +586,6 @@ def upload_imagem():
             }
         }), 500
 
-@app.route("/uploads/imagens/<nome>")
-def mostrar_imagem(nome):
-    return send_from_directory(app.config["UPLOAD_FOLDER"], nome)
 
 
 @app.route("/nova_categoria", methods=["POST"])
