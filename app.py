@@ -126,6 +126,33 @@ def notas():
     cursor = conexao.cursor()
 
     cursor.execute("""
+        SELECT
+            id,
+            titulo,
+            categoria,
+            data_criacao
+        FROM anotacoes
+        WHERE visibilidade = 'publica'
+           OR autor_id = ?
+        ORDER BY data_criacao DESC, titulo ASC
+    """, (session["usuario_id"],))
+
+    notas = cursor.fetchall()
+    conexao.close()
+
+    return render_template(
+        "notas.html",
+        notas=notas,
+        titulo_pagina="📝 Notas"
+    )
+
+@app.route("/notas/por-categoria")
+@login_obrigatorio
+def notas_por_categoria():
+    conexao = conectar()
+    cursor = conexao.cursor()
+
+    cursor.execute("""
         SELECT categoria, COUNT(*)
         FROM anotacoes
         WHERE visibilidade = 'publica'
@@ -138,12 +165,10 @@ def notas():
     conexao.close()
 
     return render_template(
-        "notas.html",
-        categorias=categorias,
-        titulo_pagina="📝 Notas"
+        "notas_por_categoria.html",
+        categorias=categorias
     )
-
-
+    
 @app.route("/notas/publicas")
 @login_obrigatorio
 def notas_publicas():

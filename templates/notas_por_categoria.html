@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <h3 class="mb-0">📁 Notas por categoria</h3>
+
+    <a href="{{ url_for('notas') }}"
+       class="btn btn-outline-primary">
+        📝 Ver todas as notas
+    </a>
+
+</div>
+
+<div class="card">
+
+    <div class="card-header bg-primary text-white">
+        Categorias
+    </div>
+
+    <div class="card-body p-0">
+
+        {% if categorias %}
+
+            {% for categoria in categorias %}
+
+                <a href="/categoria/{{ categoria[0] }}"
+                   class="text-decoration-none text-dark">
+
+                    <div class="border-bottom py-3 px-4 fs-5">
+
+                        📁 <strong>{{ categoria[0] }}</strong>
+
+                        <span class="text-secondary">
+                            ({{ categoria[1] }})
+                        </span>
+
+                    </div>
+
+                </a>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="py-4 px-4 text-secondary">
+                Nenhuma categoria encontrada.
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}
