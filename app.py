@@ -534,29 +534,52 @@ def logout():
 @login_obrigatorio
 def upload_imagem():
     if "upload" not in request.files:
-        return jsonify({"error": {"message": "Nenhuma imagem enviada."}}), 400
+        return jsonify({
+            "error": {"message": "Nenhuma imagem enviada."}
+        }), 400
 
     arquivo = request.files["upload"]
 
     if arquivo.filename == "":
-        return jsonify({"error": {"message": "Arquivo inválido."}}), 400
+        return jsonify({
+            "error": {"message": "Arquivo inválido."}
+        }), 400
 
     extensao = os.path.splitext(arquivo.filename)[1].lower()
 
-    if extensao not in [".jpg", ".jpeg", ".png", ".gif", ".webp"]:
-        return jsonify({"error": {"message": "Formato de imagem não permitido."}}), 400
+    extensoes_permitidas = [".jpg", ".jpeg", ".png", ".gif", ".webp"]
 
-    os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+    if extensao not in extensoes_permitidas:
+        return jsonify({
+            "error": {"message": "Formato de imagem não permitido."}
+        }), 400
 
-    nome = f"{uuid.uuid4()}{extensao}"
-    caminho = os.path.join(app.config["UPLOAD_FOLDER"], nome)
+    try:
+        resultado = cloudinary.uploader.upload(
+            arquivo,
+            folder="sabrinotas/imagens",
+            resource_type="image"
+        )
 
-    arquivo.save(caminho)
+        url_imagem = resultado.get("secure_url")
 
-    return jsonify({
-        "url": f"/uploads/imagens/{nome}"
-    })
+        if not url_imagem:
+            return jsonify({
+                "error": {"message": "O Cloudinary não retornou a URL da imagem."}
+            }), 500
 
+        return jsonify({
+            "url": url_imagem
+        })
+
+    except Exception as erro:
+        print(f"Erro ao enviar imagem ao Cloudinary: {erro}")
+
+        return jsonify({
+            "error": {
+                "message": "Não foi possível enviar a imagem. Tente novamente."
+            }
+        }), 500
 
 @app.route("/uploads/imagens/<nome>")
 def mostrar_imagem(nome):
