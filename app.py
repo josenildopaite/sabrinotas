@@ -4,6 +4,10 @@ from functools import wraps
 from banco import conectar, criar_banco, erro_integridade
 import os
 import uuid
+import cloudinary
+import cloudinary.uploader
+
+cloudinary.config()
 
 app = Flask(__name__)
 app.secret_key = "chave_secreta_do_sistema"
