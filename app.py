@@ -1,3 +1,4 @@
+from flask import Flask, render_template, request, redirect, jsonify, send_from_directory, session, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from banco import conectar, criar_banco, erro_integridade
