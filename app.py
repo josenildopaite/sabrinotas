@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, jsonify, send_from_directory, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
-import sqlite3
+from banco import conectar, criar_banco, erro_integridade
 import os
 import uuid
 
@@ -34,74 +34,10 @@ def admin_obrigatorio(funcao):
     return verificar_admin
 
 
-def criar_banco():
-    conexao = sqlite3.connect("base.db")
-    cursor = conexao.cursor()
-
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS anotacoes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            titulo TEXT,
-            categoria TEXT,
-            texto TEXT,
-            autor TEXT,
-            favorito INTEGER DEFAULT 0,
-            data_criacao TEXT DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS categorias (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome TEXT UNIQUE
-        )
-    """)
-
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS usuarios (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome TEXT NOT NULL,
-            email TEXT NOT NULL UNIQUE,
-            senha TEXT NOT NULL,
-            perfil TEXT NOT NULL DEFAULT 'usuario'
-        )
-    """)
-
-    try:
-        cursor.execute("ALTER TABLE anotacoes ADD COLUMN autor_id INTEGER")
-    except sqlite3.OperationalError:
-        pass
-
-    try:
-        cursor.execute("ALTER TABLE anotacoes ADD COLUMN data_atualizacao TEXT")
-    except sqlite3.OperationalError:
-        pass
-
-    try:
-        cursor.execute("ALTER TABLE anotacoes ADD COLUMN data_criacao TEXT")
-    except sqlite3.OperationalError:
-        pass
-
-    try:
-        cursor.execute("ALTER TABLE anotacoes ADD COLUMN visibilidade TEXT DEFAULT 'publica'")
-    except sqlite3.OperationalError:
-        pass
-
-    cursor.execute("""
-        INSERT OR IGNORE INTO categorias (nome)
-        SELECT DISTINCT categoria
-        FROM anotacoes
-        WHERE categoria IS NOT NULL AND categoria != ''
-    """)
-
-    conexao.commit()
-    conexao.close()
-
-
 @app.route("/", methods=["GET"])
 @login_obrigatorio
 def inicio():
-    conexao = sqlite3.connect("base.db")
+    conexao = conectar()
     cursor = conexao.cursor()
 
     usuario_id = session["usuario_id"]
@@ -180,7 +116,7 @@ def inicio():
 @app.route("/notas")
 @login_obrigatorio
 def notas():
-    conexao = sqlite3.connect("base.db")
+    conexao = conectar()
     cursor = conexao.cursor()
 
     cursor.execute("""
@@ -205,7 +141,7 @@ def notas():
 @app.route("/notas/publicas")
 @login_obrigatorio
 def notas_publicas():
-    conexao = sqlite3.connect("base.db")
+    conexao = conectar()
     cursor = conexao.cursor()
 
     cursor.execute("""
@@ -229,7 +165,7 @@ def notas_publicas():
 @app.route("/notas/privadas")
 @login_obrigatorio
 def notas_privadas():
-    conexao = sqlite3.connect("base.db")
+    conexao = conectar()
     cursor = conexao.cursor()
 
     cursor.execute("""
@@ -254,7 +190,7 @@ def notas_privadas():
 @app.route("/categoria/<categoria>")
 @login_obrigatorio
 def categoria(categoria):
-    conexao = sqlite3.connect("base.db")
+    conexao = conectar()
     cursor = conexao.cursor()
 
     cursor.execute("""
@@ -277,7 +213,7 @@ def categoria(categoria):
 @app.route("/nota/<int:id>")
 @login_obrigatorio
 def ver_nota(id):
-    conexao = sqlite3.connect("base.db")
+    conexao = conectar()
     cursor = conexao.cursor()
 
     cursor.execute("""
@@ -311,7 +247,7 @@ def ver_nota(id):
 @app.route("/editar/<int:id>", methods=["GET", "POST"])
 @login_obrigatorio
 def editar(id):
-    conexao = sqlite3.connect("base.db")
+    conexao = conectar()
     cursor = conexao.cursor()
 
     cursor.execute("""
@@ -374,7 +310,7 @@ def editar(id):
 @app.route("/excluir/<int:id>", methods=["POST"])
 @login_obrigatorio
 def excluir(id):
-    conexao = sqlite3.connect("base.db")
+    conexao = conectar()
     cursor = conexao.cursor()
 
     cursor.execute("""
@@ -395,7 +331,7 @@ def excluir(id):
 @app.route("/favoritos")
 @login_obrigatorio
 def favoritos():
-    conexao = sqlite3.connect("base.db")
+    conexao = conectar()
     cursor = conexao.cursor()
 
     cursor.execute("""
@@ -418,7 +354,7 @@ def favoritos():
 @app.route("/favoritar/<int:id>")
 @login_obrigatorio
 def favoritar(id):
-    conexao = sqlite3.connect("base.db")
+    conexao = conectar()
     cursor = conexao.cursor()
 
     cursor.execute("""
@@ -443,7 +379,7 @@ def favoritar(id):
 @app.route("/usuarios")
 @admin_obrigatorio
 def usuarios():
-    conexao = sqlite3.connect("base.db")
+    conexao = conectar()
     cursor = conexao.cursor()
 
     cursor.execute("""
@@ -467,7 +403,7 @@ def usuarios():
 @app.route("/aprovar_usuario/<int:id>", methods=["POST"])
 @admin_obrigatorio
 def aprovar_usuario(id):
-    conexao = sqlite3.connect("base.db")
+    conexao = conectar()
     cursor = conexao.cursor()
 
     cursor.execute("""
@@ -485,7 +421,7 @@ def aprovar_usuario(id):
 @app.route("/excluir_usuario/<int:id>", methods=["POST"])
 @admin_obrigatorio
 def excluir_usuario(id):
-    conexao = sqlite3.connect("base.db")
+    conexao = conectar()
     cursor = conexao.cursor()
 
     if id == session["usuario_id"]:
@@ -503,7 +439,7 @@ def excluir_usuario(id):
 @app.route("/tornar_admin/<int:id>", methods=["POST"])
 @admin_obrigatorio
 def tornar_admin(id):
-    conexao = sqlite3.connect("base.db")
+    conexao = conectar()
     cursor = conexao.cursor()
 
     cursor.execute("""
@@ -527,7 +463,7 @@ def cadastro():
 
         senha_criptografada = generate_password_hash(senha)
 
-        conexao = sqlite3.connect("base.db")
+        conexao = conectar()
         cursor = conexao.cursor()
 
         cursor.execute("SELECT COUNT(*) FROM usuarios")
@@ -546,7 +482,7 @@ def cadastro():
 
             return redirect("/login")
 
-        except sqlite3.IntegrityError:
+        except erro_integridade:
             conexao.close()
             return "Este e-mail já está cadastrado."
 
@@ -559,7 +495,7 @@ def login():
         email = request.form["email"].strip().lower()
         senha = request.form["senha"]
 
-        conexao = sqlite3.connect("base.db")
+        conexao = conectar()
         cursor = conexao.cursor()
 
         cursor.execute("""
@@ -633,7 +569,7 @@ def nova_categoria():
     nome = request.form["categoria"].strip().upper()
 
     if nome:
-        conexao = sqlite3.connect("base.db")
+        conexao = conectar()
         cursor = conexao.cursor()
 
         cursor.execute(
@@ -650,7 +586,7 @@ def nova_categoria():
 @app.route("/categorias")
 @login_obrigatorio
 def gerenciar_categorias():
-    conexao = sqlite3.connect("base.db")
+    conexao = conectar()
     cursor = conexao.cursor()
 
     cursor.execute("""
@@ -678,7 +614,7 @@ def editar_categoria(id):
     novo_nome = request.form["nome"].strip().upper()
 
     if novo_nome:
-        conexao = sqlite3.connect("base.db")
+        conexao = conectar()
         cursor = conexao.cursor()
 
         cursor.execute("SELECT nome FROM categorias WHERE id = ?", (id,))
@@ -707,7 +643,7 @@ def editar_categoria(id):
 @app.route("/excluir_categoria/<int:id>", methods=["POST"])
 @login_obrigatorio
 def excluir_categoria(id):
-    conexao = sqlite3.connect("base.db")
+    conexao = conectar()
     cursor = conexao.cursor()
 
     cursor.execute("SELECT nome FROM categorias WHERE id = ?", (id,))
@@ -737,7 +673,7 @@ def excluir_categoria(id):
 def buscar():
     termo = request.args.get("q", "")
 
-    conexao = sqlite3.connect("base.db")
+    conexao = conectar()
     cursor = conexao.cursor()
 
     cursor.execute("""
@@ -771,7 +707,7 @@ def buscar():
 @login_obrigatorio
 def nova():
 
-    conexao = sqlite3.connect("base.db")
+    conexao = conectar()
     cursor = conexao.cursor()
 
     if request.method == "POST":
@@ -855,7 +791,7 @@ def redefinir_senha(id):
     if session.get("usuario_perfil") != "admin":
         return "Acesso negado."
 
-    conexao = sqlite3.connect("base.db")
+    conexao = conectar()
     cursor = conexao.cursor()
 
     cursor.execute("""
@@ -900,7 +836,7 @@ def redefinir_senha(id):
 def meu_perfil():
     mensagem = ""
 
-    conexao = sqlite3.connect("base.db")
+    conexao = conectar()
     cursor = conexao.cursor()
 
     cursor.execute("""
