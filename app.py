@@ -176,19 +176,18 @@ def notas_publicas():
     cursor = conexao.cursor()
 
     cursor.execute("""
-        SELECT categoria, COUNT(*)
+        SELECT id, titulo
         FROM anotacoes
         WHERE visibilidade = 'publica'
-        GROUP BY categoria
-        ORDER BY categoria
+        ORDER BY id DESC
     """)
 
-    categorias = cursor.fetchall()
+    notas = cursor.fetchall()
     conexao.close()
 
     return render_template(
         "notas.html",
-        categorias=categorias,
+        notas=notas,
         titulo_pagina="🌐 Notas Públicas"
     )
 
@@ -200,20 +199,19 @@ def notas_privadas():
     cursor = conexao.cursor()
 
     cursor.execute("""
-        SELECT categoria, COUNT(*)
+        SELECT id, titulo
         FROM anotacoes
         WHERE visibilidade = 'privada'
           AND autor_id = ?
-        GROUP BY categoria
-        ORDER BY categoria
+        ORDER BY id DESC
     """, (session["usuario_id"],))
 
-    categorias = cursor.fetchall()
+    notas = cursor.fetchall()
     conexao.close()
 
     return render_template(
         "notas.html",
-        categorias=categorias,
+        notas=notas,
         titulo_pagina="🔒 Minhas Notas"
     )
 

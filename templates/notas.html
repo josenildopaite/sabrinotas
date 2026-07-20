@@ -4,7 +4,9 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
 
-    <h3 class="mb-0">📝 Notas</h3>
+    <h3 class="mb-0">
+    {{ titulo_pagina if titulo_pagina else "📝 Notas" }}
+</h3>
 
     <a href="{{ url_for('notas_por_categoria') }}"
        class="btn btn-outline-primary">
