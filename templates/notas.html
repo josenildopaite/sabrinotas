@@ -23,8 +23,8 @@
 
             {% for nota in notas %}
 
-                <a href="{{ url_for('ver_nota', id=nota[0]) }}"
-                   class="text-decoration-none">
+                <a href="{{ url_for('ver_nota', id=nota[0], origem=request.path) }}"
+                class="text-decoration-none">
 
                     <div class="border-bottom py-1 px-4 fs-5">
 

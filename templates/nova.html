@@ -78,18 +78,19 @@
     }
 
     var quill = new Quill('#editor', {
-        theme: 'snow',
-        placeholder: 'Digite sua nota aqui ou cole um print com CTRL + V...',
-        modules: {
-            toolbar: [
-                [{ 'header': [1, 2, 3, false] }],
-                ['bold', 'italic', 'underline'],
-                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                ['link'],
-                ['clean']
-            ]
-        }
-    });
+    theme: 'snow',
+    placeholder: 'Digite sua nota aqui ou cole um print com CTRL + V...',
+    modules: {
+        toolbar: [
+            [{ 'header': [1, 2, 3, false] }],
+            ['bold', 'italic', 'underline'],
+            [{ 'color': [] }, { 'background': [] }],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+            ['link'],
+            ['clean']
+        ]
+    }
+});
 
     quill.root.addEventListener('paste', function(e) {
         var clipboard = e.clipboardData || window.clipboardData;

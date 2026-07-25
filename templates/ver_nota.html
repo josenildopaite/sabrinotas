@@ -60,7 +60,8 @@
 
 </div>
 
-<a href="{{ url_for('notas') }}" class="btn btn-sm btn-secondary mt-3">
+<a href="{{ request.args.get('origem', url_for('notas')) }}"
+   class="btn btn-sm btn-secondary mt-3">
     ← Voltar
 </a>
 
