@@ -299,7 +299,7 @@ def editar(id):
         titulo = request.form["titulo"]
         categoria = request.form["categoria"]
         texto = request.form.get("texto") or request.form.get("conteudo") or ""
-        visibilidade = request.form.get("visibilidade", "publica")
+        visibilidade = request.form.get("visibilidade")
 
         cursor.execute("""
             UPDATE anotacoes
